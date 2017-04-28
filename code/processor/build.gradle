@@ -1,0 +1,51 @@
+subprojects {
+    apply plugin: 'maven-publish'
+    apply plugin: 'java'
+
+    jar {
+        from {
+            configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+        }
+        manifest {
+            attributes 'Main-Class': 'org.chiflink.telemetry.processor.vehicle.VehicleProcessor'
+        }
+    }
+
+    dependencies {
+
+    }
+
+    publishing.repositories {
+        ['release', 'iteration', 'sprint', 'manual'].each { ciRepoName ->
+            maven {
+                name = "ci${ciRepoName.capitalize()}"
+                url = "https://url/nexus/repository/maven-ci-$ciRepoName/"
+                credentials {
+                    username project.properties.get('UNKNOWN', 'UNKNOWN')
+                    password project.properties.get('UNKNOWN', 'UNKNOWN')
+                }
+            }
+        }
+    }
+
+    project.afterEvaluate {
+        publishing.publications {
+            release(MavenPublication) {
+                groupId project.group
+                artifactId project.archivesBaseName
+
+                artifact jar
+            }
+
+            snapshot(MavenPublication) {
+                groupId publishing.publications.release.groupId
+                artifactId publishing.publications.release.artifactId
+                version = "${project.version}-SNAPSHOT"
+
+                artifact jar
+            }
+        }
+    }
+
+}
+

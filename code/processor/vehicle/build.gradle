@@ -1,0 +1,28 @@
+group 'org.chiflink.telemetry.processor'
+ext.archivesBaseName = 'vehicle-processor'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'scala'
+
+dependencies {
+
+    compile deps.flinkClients
+    compile deps.flinkConnectorKafka
+    compile deps.flinkScala
+    compile deps.flinkStreamingScala
+    compile deps.jcommander
+    compile deps.scalaStdlib
+    compile deps.slf4jApi
+}
+
+task run(type:JavaExec) {
+    main = 'org.chiflink.telemetry.processor.vehicle.VehicleProcessor'
+    classpath sourceSets.main.runtimeClasspath
+    args "@./resources/vehicleProcessor.properties"
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'org.chiflink.telemetry.processor.vehicle.VehicleProcessor'
+    }
+}

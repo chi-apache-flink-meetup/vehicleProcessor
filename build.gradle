@@ -1,0 +1,62 @@
+buildscript {
+
+    ext {
+        versions = [
+                flink: "1.2.0",
+                flinkJavaVersion: '2.10',
+                flinkScalaVersion: '2.11',
+                flinkKafkaVersion: '0.10',
+                slf4jVersion: '1.7.25',    // 'latest' got advances to 1.8 ?
+        ]
+        pluginDeps = [
+
+        ]
+        deps = [
+                flinkClients: "org.apache.flink:flink-clients_${versions.flinkScalaVersion}:${versions.flink}",
+                flinkConnectorKafka: "org.apache.flink:flink-connector-kafka-${versions.flinkKafkaVersion}_${versions.flinkScalaVersion}:${versions.flink}",
+                flinkScala: "org.apache.flink:flink-scala_${versions.flinkScalaVersion}:${versions.flink}",
+                flinkStreamingScala: "org.apache.flink:flink-streaming-scala_${versions.flinkScalaVersion}:${versions.flink}",
+                flinkJava: "org.apache.flink:flink-java:${versions.flink}",
+                flinkStreamingJava: "org.apache.flink:flink-streaming-java_${versions.flinkJavaVersion}:${versions.flink}",
+                flinkRocksDB: "org.apache.flink:flink-statebackend-rocksdb_${versions.flinkScalaVersion}:${versions.flink}",
+                guava: 'com.google.guava:guava:21.0',
+                jcommander: 'com.beust:jcommander:1.60',
+                junit: 'junit:junit:4.12',
+                scalaStdlib: 'org.scala-lang:scala-library:2.10.1',
+                py4j: "net.sf.py4j:py4j:${versions.py4j}",
+                slf4jApi: "org.slf4j:slf4j-api:${versions.slf4jVersion}",
+                slf4jConnector: "org.slf4j:slf4j-log4j12:${versions.slf4jVersion}",
+                log4j: 'log4j:log4j:1.2.17',
+        ]
+
+    }
+
+    repositories {
+        jcenter()
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath 'net.saliman:gradle-properties-plugin:1.4.6'
+        classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.3'
+    }
+
+}
+
+apply plugin: 'base'
+
+allprojects {
+    apply plugin: 'net.saliman.properties'
+
+    repositories {
+        jcenter()
+        mavenCentral()
+    }
+
+    pluginManager.withPlugin("scala") {
+        sourceSets.main {
+            scala.srcDir "src/main/java"
+            java.srcDirs = []
+        }
+    }
+}
