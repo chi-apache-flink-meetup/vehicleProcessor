@@ -7,7 +7,9 @@ import com.beust.jcommander.JCommander
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer010
 import org.apache.flink.streaming.api.TimeCharacteristic
 import org.apache.flink.streaming.api.scala.StreamExecutionEnvironment
+import org.apache.flink.streaming.util.serialization.SimpleStringSchema
 import org.slf4j.LoggerFactory
+import org.apache.flink.streaming.api.scala._
 
 object VehicleProcessor {
 
@@ -36,14 +38,19 @@ object VehicleProcessor {
     kafkaProps.setProperty("bootstrap.servers", this.config.kafkaBootStrapServer)
     kafkaProps.setProperty("group.id", this.config.consumerGroupId)
 
-    val consumer = new FlinkKafkaConsumer010[](
+    if (this.config.fromTopicStart) {
+      this.logger.info("Running from the start of the Kafka topic")
+      kafkaProps.setProperty("auto.offset.reset", "earliest")
+    }
+
+    val consumer = new FlinkKafkaConsumer010[String](
       this.config.kafkaTopic,
-      //new TelemetrySchema,
+      // Change this to an object. But how? All messages are different.
+      new SimpleStringSchema(),
       kafkaProps)
 
     val stream = env.addSource(consumer)
-      .keyBy(x => ())
-      .flatMap(new VehicleCalculator().name("VehicleCalculator"))
+      .flatMap(new VehicleCalculator)
 
     env.execute("VehicleProcessor")
     this.logger.info("Ending VehicleProcessor...")

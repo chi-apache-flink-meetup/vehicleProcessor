@@ -2,6 +2,7 @@ package org.chiflink.telemetry.processor.vehicle;
 
 
 import com.beust.jcommander.Parameter;
+import com.beust.jcommander.Parameters;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.flink.api.common.ExecutionConfig;
@@ -10,6 +11,7 @@ import java.io.Serializable;
 import java.util.Collections;
 import java.util.Map;
 
+@Parameters(separators="=")
 public final class VehicleProcessorArgs extends ExecutionConfig.GlobalJobParameters
         implements Serializable, Cloneable {
 
@@ -31,6 +33,10 @@ public final class VehicleProcessorArgs extends ExecutionConfig.GlobalJobParamet
 
     @Parameter(names = {"--checkpoint-interval"})
     public Long checkpointInterval = 0L;
+
+    @Parameter(names = {"--from-topic-start"}, arity = 1)
+    public Boolean fromTopicStart = false;
+
 
     @Override
     protected Object clone() {
